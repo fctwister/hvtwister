@@ -73,7 +73,7 @@ async function getPollData(page) {
 		console.log("Starting vertical scroll. Previous height: " + previousHeight);
 		await page.evaluate('window.scrollTo(0, document.body.scrollHeight)');
 		await page.waitForFunction(`document.body.scrollHeight > ${previousHeight}`);
-		await page.waitFor(3000);
+		await page.waitFor(5000);
 	}
 
 	// Get all posts including a poll
