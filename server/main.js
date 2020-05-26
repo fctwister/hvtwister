@@ -69,11 +69,15 @@ async function getPollData(page) {
 
 	// Scroll vertically to relevant poll location (increase scrollLimit for more results)
 	for(let i=0; i<scrollLimit; i++) {
-		previousHeight = await page.evaluate('document.body.scrollHeight');
-		console.log("Starting vertical scroll. Previous height: " + previousHeight);
-		await page.evaluate('window.scrollTo(0, document.body.scrollHeight)');
-		await page.waitForFunction(`document.body.scrollHeight > ${previousHeight}`);
-		await page.waitFor(5000);
+		try {
+			previousHeight = await page.evaluate('document.body.scrollHeight');
+			console.log("Starting vertical scroll. Previous height: " + previousHeight);
+			await page.evaluate('window.scrollTo(0, document.body.scrollHeight)');
+			await page.waitForFunction(`document.body.scrollHeight > ${previousHeight}`);
+			await page.waitFor(5000);
+		} catch(e) {
+			console.error("Scrolling failed: " + e.message);
+		}
 	}
 
 	// Get all posts including a poll
