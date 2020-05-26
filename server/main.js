@@ -72,7 +72,7 @@ async function getPollData(page) {
 		previousHeight = await page.evaluate('document.body.scrollHeight');
 		console.log("Starting vertical scroll. Previous height: " + previousHeight);
 		await page.evaluate('window.scrollTo(0, document.body.scrollHeight)');
-		await page.waitForFunction('document.body.scrollHeight > previousHeight');
+		await page.waitForFunction(`document.body.scrollHeight > ${previousHeight}`);
 		await page.waitFor(5000);
 	}
 
