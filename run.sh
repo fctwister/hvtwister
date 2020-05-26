@@ -1,4 +1,4 @@
 #!/bin/bash
 echo "Starting hvtwister"
-meteor --settings settings.json &>> /home/betfield/logs/hvtwister.log
+meteor --port 3010 --settings settings.json &>> /home/betfield/logs/hvtwister.log
 
