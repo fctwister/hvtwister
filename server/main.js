@@ -38,19 +38,16 @@ async function run() {
 
 		// Navigate to the HV Twister group page
 		await getPollData(page);
-
-		/*
 		
 		// wait and click the alert button
-		console.log('Waiting for 3s');
-		await page.waitFor(3000);
+		//console.log('Waiting for 3s');
+		//await page.waitFor(3000);
 
 		await page.close();
         console.log('Page closed');
         
         await browser.close();
 		console.log('Browser closed');
-		*/
 
 	} catch (e) {
 		console.log(e);
@@ -64,6 +61,14 @@ async function getPollData(page) {
 	await page.waitForNavigation();
 	console.log("HV Twister page loaded");
 
+	// wait and click the alert button (quickfix - otherwise it will not work)
+	console.log('Waiting for 3s');
+	await page.waitFor(3000);
+
+	// Close reminders black screen
+	await page.keyboard.press('Escape');
+	console.log('Escape pressed - black screen closed');
+
 	let previousHeight;
 	let scrollLimit = Meteor.settings.private.scrollLimit;
 
@@ -74,7 +79,7 @@ async function getPollData(page) {
 			console.log("Starting vertical scroll. Previous height: " + previousHeight);
 			await page.evaluate('window.scrollTo(0, document.body.scrollHeight)');
 			await page.waitForFunction(`document.body.scrollHeight > ${previousHeight}`);
-			await page.waitFor(5000);
+			await page.waitFor(3000);
 		} catch(e) {
 			console.error("Scrolling failed: " + e.message);
 		}
