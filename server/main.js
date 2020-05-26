@@ -16,16 +16,16 @@ Meteor.startup(function () {
 async function run() {
 
 	const browser = await puppeteer.launch({
-		headless: false,
+		headless: true,
 		defaultViewport: {	
 			width: 1920,	
 			height: 1080	
 		},
-		executablePath: 'D://Programs//Meteor//hvtwister//node_modules//puppeteer//.local-chromium//win64-722234//chrome-win//chrome.exe',
+		//executablePath: Meteor.settings.private.executablePath,
 		args: [
 			`--window-size=1920,1080`,  // set browser size
-  			'--user-data-dir=D://Temp//puppeteer'
-		//'--disable-gl-drawing-for-tests' // improve performance
+  			//'--user-data-dir=' + Meteor.settings.private.userDataDir,
+			'--disable-gl-drawing-for-tests' // improve performance
 		] 
 	});
   

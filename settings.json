@@ -2,6 +2,8 @@
 	"public" : {
 	},
 	"private": {
-		"scrollLimit": 3
+		"scrollLimit": 3,
+		"executablePath": "D://Programs//Meteor//hvtwister//node_modules//puppeteer//.local-chromium//win64-722234//chrome-win//chrome.exe",
+		"userDataDir": "D://Temp//puppeteer"
     }
 }
