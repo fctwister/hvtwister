@@ -64,17 +64,17 @@ async function getPollData(page) {
 	await page.waitForNavigation();
 	console.log("HV Twister page loaded");
 
-	let previousHeight = 10000;
+	let previousHeight;
 	let scrollLimit = Meteor.settings.private.scrollLimit;
 
 	// Scroll vertically to relevant poll location (increase scrollLimit for more results)
 	for(let i=0; i<scrollLimit; i++) {
 		try {
+			previousHeight = await page.evaluate('document.body.scrollHeight');
 			console.log("Starting vertical scroll. Previous height: " + previousHeight);
 			await page.evaluate('window.scrollTo(0, document.body.scrollHeight)');
 			await page.waitForFunction(`document.body.scrollHeight > ${previousHeight}`);
 			await page.waitFor(5000);
-			previousHeight = await page.evaluate('document.body.scrollHeight');
 		} catch(e) {
 			console.error("Scrolling failed: " + e.message);
 		}
