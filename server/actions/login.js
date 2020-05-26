@@ -4,6 +4,7 @@ const CONFIG = require('../config/config');
 // DOM element selectors
 const URL_MAIN = 'https://facebook.com/';
 const LOGIN_TITLE = 'Facebook - Log In or Sign Up';
+const LOGIN_TITLE_US = 'Facebook – log in or sign up';
 const LOGGED_IN_TITLE = 'Facebook';
 const LOGGED_IN_TITLE_NOTIFICATIONS = /Facebook([0-9])/;
 const SEL_USERNAME = '//*[@id="email"]';
@@ -59,7 +60,7 @@ async function startloginFlow(page) {
         if (result === LOGGED_IN_TITLE || result === LOGGED_IN_TITLE_NOTIFICATIONS) {
             // End login flow and return the resulting page object
             console.log("Facebook user logged in");
-        } else if (result === LOGIN_TITLE) {
+        } else if (result === LOGIN_TITLE || result === LOGIN_TITLE_US) {
             await enterLoginDetails(page);
         } else {
             // Throw error about incorrect page title
