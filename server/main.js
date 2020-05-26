@@ -25,7 +25,7 @@ async function run() {
 		args: [
 			`--window-size=1920,1080`,  // set browser size
   			//'--user-data-dir=' + Meteor.settings.private.userDataDir,
-			'--disable-gl-drawing-for-tests' // improve performance
+			//'--disable-gl-drawing-for-tests' // improve performance
 		] 
 	});
   
