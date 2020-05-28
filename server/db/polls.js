@@ -9,6 +9,8 @@ function updatePolls(polls) {
             $set: poll
         });
     })
+
+    console.log("Polls updated");
 }
 
 export { updatePolls }

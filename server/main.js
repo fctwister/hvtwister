@@ -10,7 +10,11 @@ const URL_VOTERS='https://www.facebook.com/browse/option_voters?option_id=';
 
 // Run this when the meteor app is started
 Meteor.startup(function () {
-	run();
+	// Initate script to run once per day
+	Meteor.setInterval(() => {
+		console.log("Starting the Polls scraper");
+		run();
+	}, Meteor.settings.private.scritpInterval);
 });
 
 async function run() {
@@ -39,10 +43,6 @@ async function run() {
 		// Navigate to the HV Twister group page
 		await getPollData(page);
 		
-		// wait and click the alert button
-		//console.log('Waiting for 3s');
-		//await page.waitFor(3000);
-
 		await page.close();
         console.log('Page closed');
         
@@ -69,6 +69,12 @@ async function getPollData(page) {
 	await page.keyboard.press('Escape');
 	console.log('Escape pressed - black screen closed');
 
+	/**
+	 * The below section should be uncommented in case more polls from history are needed
+	 */
+	
+	/*
+
 	let previousHeight;
 	let scrollLimit = Meteor.settings.private.scrollLimit;
 
@@ -85,14 +91,13 @@ async function getPollData(page) {
 		}
 	}
 
+	*/
+
 	// Get all posts including a poll
 	const polls = await page.evaluate(() => Array.from(document.querySelectorAll('._3ccb:not(._4pu6)'), element => element.innerHTML));
 
 	// Filter out only relevant polls
 	await filterRelevantPolls(polls, page);
-
-	//console.log("Waiting for request data..");
-	//getGraphQLRequest();
 
 	return page;
 };
