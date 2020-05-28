@@ -14,7 +14,7 @@ Meteor.startup(function () {
 	Meteor.setInterval(() => {
 		console.log("Starting the Polls scraper");
 		run();
-	}, Meteor.settings.private.scritpInterval);
+	}, Meteor.settings.private.scriptInterval);
 });
 
 async function run() {
