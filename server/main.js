@@ -2,6 +2,7 @@ import { Meteor } from 'meteor/meteor';
 import puppeteer from 'puppeteer';
 import loginPage from './actions/login';
 import { updatePolls } from './db/polls';
+import '../imports/publish/polls';
 
 var fs = require('fs');
 
@@ -11,10 +12,12 @@ const URL_VOTERS='https://www.facebook.com/browse/option_voters?option_id=';
 // Run this when the meteor app is started
 Meteor.startup(function () {
 	// Initate script to run once per day
+	/*
 	Meteor.setInterval(() => {
 		console.log("Starting the Polls scraper");
 		run();
 	}, Meteor.settings.private.scriptInterval);
+	*/
 });
 
 async function run() {
