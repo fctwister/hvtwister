@@ -79,8 +79,6 @@ async function getPollData(page) {
 	/**
 	 * The below section should be uncommented in case more polls from history are needed
 	 */
-	
-	/*
 
 	let previousHeight;
 	let scrollLimit = Meteor.settings.private.scrollLimit;
@@ -97,8 +95,6 @@ async function getPollData(page) {
 			console.error("Scrolling failed: " + e.message);
 		}
 	}
-
-	*/
 
 	// Get all posts including a poll
 	const polls = await page.evaluate(() => Array.from(document.querySelectorAll('._3ccb:not(._4pu6)'), element => element.innerHTML));
