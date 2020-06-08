@@ -11,13 +11,17 @@ const URL_VOTERS='https://www.facebook.com/browse/option_voters?option_id=';
 
 // Run this when the meteor app is started
 Meteor.startup(function () {
-	// Initate script to run once per day
-	/*
-	Meteor.setInterval(() => {
-		console.log("Starting the Polls scraper");
-		run();
-	}, Meteor.settings.private.scriptInterval);
-	*/
+	// Initate script to run periodically
+	
+	if (Meteor.settings.private.testMode) {
+		console.log("App running in test mode");
+	} else {
+		console.log("App running in production mode");
+		Meteor.setInterval(() => {
+			console.log("Starting the Polls scraper");
+			run();
+		}, Meteor.settings.private.scriptInterval);
+	}
 });
 
 async function run() {
@@ -199,7 +203,7 @@ async function filterRelevantPolls(polls, page) {
 
 				// If link exists for all voters, get names from URL
 				if (votersURL != "") {
-					optionVoters.push(await parseVotersURL(page, votersURL));					
+					optionVoters = await parseVotersURL(page, votersURL);					
 				// If link does not exist, get names form poll directly
 				} else {
 					for (let cell = 0; cell < (votersItems.length - 1); cell++) {
@@ -221,7 +225,7 @@ async function filterRelevantPolls(polls, page) {
 				creator: name,
 				date: date,
 				message: message,
-				voters: voters
+				answers: voters
 			})
 			
 		} catch (e) {
