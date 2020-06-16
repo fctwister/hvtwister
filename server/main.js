@@ -15,6 +15,7 @@ Meteor.startup(function () {
 	
 	if (Meteor.settings.private.testMode) {
 		console.log("App running in test mode");
+		//run();
 	} else {
 		console.log("App running in production mode");
 		Meteor.setInterval(() => {
@@ -27,7 +28,7 @@ Meteor.startup(function () {
 async function run() {
 
 	const browser = await puppeteer.launch({
-		headless: true,
+		headless: false,
 		defaultViewport: {	
 			width: 1920,	
 			height: 1080	
@@ -35,7 +36,7 @@ async function run() {
 		//executablePath: Meteor.settings.private.executablePath,
 		args: [
 			`--window-size=1920,1080`,  // set browser size
-  			//'--user-data-dir=' + Meteor.settings.private.userDataDir,
+  			'--user-data-dir=' + Meteor.settings.private.userDataDir,
 			//'--disable-gl-drawing-for-tests' // improve performance
 		] 
 	});
@@ -49,13 +50,13 @@ async function run() {
 
 		// Navigate to the HV Twister group page
 		await getPollData(page);
-		
+		/*
 		await page.close();
         console.log('Page closed');
         
         await browser.close();
 		console.log('Browser closed');
-
+		*/
 	} catch (e) {
 		console.log(e);
 	}
@@ -97,7 +98,7 @@ async function getPollData(page) {
 	}
 
 	// Get all posts including a poll
-	const polls = await page.evaluate(() => Array.from(document.querySelectorAll('._3ccb:not(._4pu6)'), element => element.innerHTML));
+	const polls = await page.evaluate(() => Array.from(document.querySelectorAll('//*[@id="facebook"]/body/script[73]/text()'), element => element.innerHTML));
 
 	// Filter out only relevant polls
 	await filterRelevantPolls(polls, page);
@@ -145,48 +146,59 @@ async function filterRelevantPolls(polls, page) {
 	// Loop through all polls
 	let relevantPolls = [];
 
+	console.log("Polls length: " + polls.length);
+
 	for (let i=0; i<polls.length; i++) {
-
-		console.log("Poll nr " + i);
-
-		// Extract poll creator name
-		const name = polls[i].split('rel=\"dialog\" title=\"')[1].split('\" aria-hidden=\"true\"')[0];
 		
-		// Extract poll date
-		const dateString = polls[i].split(/data-utime="[0-9]*" title="/)[1].split('\" data-shorten=\"1\"')[0];
-		const temp = dateString.split(". ")[1].split(" ");
+			console.log("Poll nr " + i);
 
-		const day = dateString.split(" ")[1].split(".")[0];
-		const month = temp[0];
-		const year = temp[1];
-		const time = temp[3].split(":");
+			// Extract poll creator name
+			const name = polls[i].split('<div class=\"nc684nl6\"><span>')[1].split('</span></div>')[0];
+			
+			// Extract poll date
+			/*const dateString = polls[i].split(/data-utime="[0-9]*" title="/)[1].split('\" data-shorten=\"1\"')[0];
+			const temp = dateString.split(". ")[1].split(" ");
 
-		const date = new Date(year, getMonth(month), day, time[0], time[1]);
+			const day = dateString.split(" ")[1].split(".")[0];
+			const month = temp[0];
+			const year = temp[1];
+			const time = temp[3].split(":");
 
-		// Extract poll message
-		// TODO - add handling logic for multiple paragraphs
+			const date = new Date(year, getMonth(month), day, time[0], time[1]);
+			*/
+			// Extract poll message
+			// TODO - add handling logic for multiple paragraphs
 
-		let message = "";
+			let message = "";
 		try {
-			message = polls[i].split('<p>')[1].split('</p>')[0];
-
+			message = polls[i].split('<div dir=\"auto\" style=\"text-align: start;\">')[1].split('</div>')[0];
+			console.log(message);
 			// Extract poll options
-			const optionsString = polls[i].split('<div class=\"_3con\"><span><span>');
+			const optionsString = polls[i].split('<span class=\"oi732d6d ik7dh3pa d2edcug0 qv66sw1b c1et5uql a8c37x1j muag1w35 enqfppq2 jq4qci2q a3bd9o3v knj5qynh oo9gr5id\" dir=\"auto\">');
 			const options = [];
 
 			for (let iter = 1; iter < optionsString.length; iter++) {
-				options.push(optionsString[iter].split('</span></span></div>')[0]);
+				let tmp = optionsString[iter].split('</span></div></div></div></div></div></div><div class=\"a8yuo7t3');
+
+				if (tmp.length > 1) {
+					options.push(tmp[0]);
+				}
+
 			}
 
+			console.log(options);
+
 			// Extract voters for each option
-			const votersRow = polls[i].split('<ul class=\"_4cg3 uiList  _4ki _509-\">');
+			const votersRow = polls[i].split('<div class=\"j83agx80 btwxx1t3 pfnyh3mw lhclo0ds ni8dbmo4 stjgntxs l9j0dhe7\" role=\"row\" style=\"height: 24px;\">');
 			
 			const voters = [];
 			let optionVoters = [];
 
 			for (let iter = 1; iter < votersRow.length; iter++) {
-				const votersItems = votersRow[iter].split('\" class=\"_2rt_ link\"');
+				const votersItems = votersRow[iter].split('<div class=\"sej5wr8e l9j0dhe7\" role=\"cell\">');
 				let votersURL = "";
+
+				console.log("Voters item length: " + votersItems.length);
 
 				// Check if link exists for all voters (More option)
 				try {

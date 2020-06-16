@@ -11,10 +11,12 @@ export default class PollVoters extends React.Component {
     const data = this.props.data;
     const pollDates = [];
     
-    let votersData = [];
-    let names = [];
+    let votersMatrix = [];
+    let dates = [];
+    let votersArray = [];
 
     // Extract date for table header and voters for table data
+    // TODO: Order dates asc
     data.forEach(pollData => {
       // Create date string and push to the pollDates array
       let date = new Date(pollData.date).getDate() + "." + (new Date(pollData.date).getMonth() + 1);
@@ -22,26 +24,31 @@ export default class PollVoters extends React.Component {
 
       // Iterate over all poll answers in case some exist
       //TODO: change .voters to .answers
-      votersData = pollData.voters;
-      if (votersData !== undefined) {
-        votersData.forEach(answer => {
+      votersMatrix = pollData.voters;
+      if (votersMatrix !== undefined) {
+        votersMatrix.forEach(answer => {
 
           // Check if answer is part of the valid options array and only process voters for these
           VALID_OPTIONS.forEach(validOption => {
 
             if(validOption === answer.option) {
-              answer.voters.forEach(voter => {
-                
-                // Add poll date to the relevant voter name in the names array
-                if (names[voter] !== undefined) {
-                  names[voter].push(date);
-                  console.log(names[voter]);
+              // TODO: voters array needs to be one level higher
+              answer.voters[0].forEach(voter => {
+                // Search for voter name in the votersArray
+                const res = search(voter, votersArray);
+
+                // If voter does not exist, create a new object in the array
+                if (res === null) {
+                  votersArray.push({
+                    name: voter,
+                    dates: [date]
+                  });
+                  // else, push the new date value in the resulting array from the search
                 } else {
-                  names[voter] = [date];
+                  votersArray[res].dates.push(date);
                 }
-
+                
               })
-
 
             }
           })
@@ -51,6 +58,13 @@ export default class PollVoters extends React.Component {
 
     });
 
+    let votersData = {
+      dates: pollDates,
+      names: votersArray
+    }
+
+    console.log(votersData);
+
     return (
       <table>
         <VotersHeader dates={pollDates} />
@@ -58,4 +72,13 @@ export default class PollVoters extends React.Component {
       </table>
     );
   }
+}
+
+function search(nameKey, myArray){
+  for (var i=0; i < myArray.length; i++) {
+      if (myArray[i].name === nameKey) {
+          return i;
+      }
+  }
+  return null;
 }

@@ -5,12 +5,12 @@ export default class VotersRow extends React.Component {
   
   render() {
 
-    const voters = this.props.voters;
+    const values = this.props.voterValues;
     const cells = [];
 
-    voters.forEach((option, iter) => {
+    values.forEach((cellValue, iter) => {
         cells.push(
-            <VotersCell key={iter} value={option.option} />
+            <VotersCell key={iter} value={cellValue} />
         );
     })
       
