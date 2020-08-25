@@ -4,7 +4,7 @@
 	"private": {
 		"headless": true,
 		"scrollLimit": 0,
-		"scriptInterval": 60000,
+		"scriptInterval": 3600000,
 		"testMode": false
     }
 }
