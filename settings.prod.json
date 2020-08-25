@@ -1,0 +1,11 @@
+{
+	"public" : {
+	},
+	"private": {
+		"headless": true,
+		"scrollLimit": 0,
+		"scriptInterval": 3600000,
+		"testMode": false,
+		"userDataDir": "../puppeteer"
+    }
+}

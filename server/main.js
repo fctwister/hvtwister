@@ -30,7 +30,7 @@ Meteor.startup(function () {
 async function run() {
 
 	const browser = await puppeteer.launch({
-		headless: false,
+		headless: Meteor.settings.private.headless,
 		defaultViewport: {	
 			width: 1920,	
 			height: 1080	
