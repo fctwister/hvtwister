@@ -5,7 +5,6 @@
 		"headless": true,
 		"scrollLimit": 0,
 		"scriptInterval": 60000,
-		"testMode": false,
-		"userDataDir": "../puppeteer"
+		"testMode": false
     }
 }

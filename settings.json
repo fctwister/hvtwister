@@ -2,10 +2,10 @@
 	"public" : {
 	},
 	"private": {
+		"headless": true,
 		"scrollLimit": 3,
 		"scriptInterval": 60000,
 		"executablePath": "D://Programs//Meteor//hvtwister//node_modules//puppeteer//.local-chromium//win64-722234//chrome-win//chrome.exe",
-		"userDataDir": "D://Temp//puppeteer",
-		"testMode": true  
+		"testMode": false  
     }
 }

@@ -38,7 +38,7 @@ async function run() {
 		//executablePath: Meteor.settings.private.executablePath,
 		args: [
 			`--window-size=1920,1080`,  // set browser size
-  			'--user-data-dir=' + Meteor.settings.private.userDataDir,
+  			//'--user-data-dir=' + Meteor.settings.private.userDataDir,
 			//'--disable-gl-drawing-for-tests' // improve performance
 		] 
 	});
@@ -52,13 +52,13 @@ async function run() {
 
 		// Navigate to the HV Twister group page
 		await getPollData(page);
-		/*
+		
 		await page.close();
         console.log('Page closed');
         
         await browser.close();
 		console.log('Browser closed');
-		*/
+		
 	} catch (e) {
 		console.log(e);
 	}
