@@ -6,15 +6,16 @@ export default class VotersData extends React.Component {
   render() {
   
     const voters = this.props.votersData.names;
-    const dates = this.props.votersData.dates;
+    const options = this.props.votersData.options;
 
     const result = [];
 
     voters.forEach( voter => {
       const voterValues = []
 
-      dates.forEach(date => {
-        if (voter.dates.includes(date)) {
+      options.forEach(option => {
+        // Check if array contains object with certain property
+        if (voter.options.some(e => e.id === option.id)) {
           voterValues.push(1);
         } else {
           voterValues.push(0);

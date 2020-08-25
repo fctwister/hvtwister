@@ -4,12 +4,12 @@ export default class VotersHeader extends React.Component {
   
     render() {
         
-        const dates = this.props.dates;
+        const headersData = this.props.headersData;
         const headers = [];
 
-        dates.forEach((date, iter) => {
+        headersData.forEach((option, iter) => {
             headers.push(
-                <th key={iter}>{date}</th>
+                <th key={iter}>{option.text} ({option.pollDate.getDate()}/{option.pollDate.getMonth()+1})</th>
             );
         })
 

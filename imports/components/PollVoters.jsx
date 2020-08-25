@@ -3,6 +3,7 @@ import VotersHeader from './VotersHeader';
 import VotersData from './VotersData';
 
 const VALID_OPTIONS = ["yes", "1", "Hell yeah"];
+let votersArray = [];
 
 export default class PollVoters extends React.Component {
   
@@ -10,10 +11,10 @@ export default class PollVoters extends React.Component {
     
     const data = this.props.data;
     const pollDates = [];
+    const pollValidOptions = [];
     
     let votersMatrix = [];
-    let dates = [];
-    let votersArray = [];
+    let validOptionFound = false;
 
     // Extract date for table header and voters for table data
     // TODO: Order dates asc
@@ -23,35 +24,27 @@ export default class PollVoters extends React.Component {
       pollDates.push(date);
 
       // Iterate over all poll answers in case some exist
-      //TODO: change .voters to .answers
-      votersMatrix = pollData.voters;
+      votersMatrix = pollData.answers;
+      validOptionFound = false;
+
       if (votersMatrix !== undefined) {
         votersMatrix.forEach(answer => {
 
           // Check if answer is part of the valid options array and only process voters for these
           VALID_OPTIONS.forEach(validOption => {
-
-            if(validOption === answer.option) {
-              // TODO: voters array needs to be one level higher
-              answer.voters[0].forEach(voter => {
-                // Search for voter name in the votersArray
-                const res = search(voter, votersArray);
-
-                // If voter does not exist, create a new object in the array
-                if (res === null) {
-                  votersArray.push({
-                    name: voter,
-                    dates: [date]
-                  });
-                  // else, push the new date value in the resulting array from the search
-                } else {
-                  votersArray[res].dates.push(date);
-                }
-                
-              })
-
+            if(answer.option && validOption === answer.option.text) {
+              updateVotersArray(answer, date);
+              pollValidOptions.push(answer.option);
+              validOptionFound = true;
             }
           })
+
+          if(validOptionFound) {
+            validOptionFound = false;
+          } else if (/.*- 1$/.test(answer.option.text)) {
+            updateVotersArray(answer, date);
+            pollValidOptions.push(answer.option);
+          }
             
         })
       }
@@ -60,14 +53,13 @@ export default class PollVoters extends React.Component {
 
     let votersData = {
       dates: pollDates,
+      options: pollValidOptions,
       names: votersArray
     }
 
-    console.log(votersData);
-
     return (
       <table>
-        <VotersHeader dates={pollDates} />
+        <VotersHeader headersData={pollValidOptions} />
         <VotersData votersData={votersData}/>
       </table>
     );
@@ -81,4 +73,24 @@ function search(nameKey, myArray){
       }
   }
   return null;
+}
+
+function updateVotersArray(answer, date) {
+  answer.voters.forEach(voter => {
+    // Search for voter name in the votersArray
+    const res = search(voter, votersArray);
+
+    // If voter does not exist, create a new object in the array
+    if (res === null) {
+      votersArray.push({
+        name: voter,
+        dates: [date],
+        options: [answer.option]
+      });
+      // else, push the new date value in the resulting array from the search
+    } else {
+      votersArray[res].dates.push(date);
+      votersArray[res].options.push(answer.option);
+    }
+  })
 }

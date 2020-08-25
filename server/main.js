@@ -8,6 +8,8 @@ var fs = require('fs');
 
 const URL_HVTWISTER = 'https://www.facebook.com/groups/hvjalka';
 const URL_VOTERS='https://www.facebook.com/browse/option_voters?option_id=';
+const SEL_CURRENT_POLL = '/html/body/div[1]/div/div[1]/div[1]/div[3]/div/div/div[1]/div[1]/div[4]/div/div/div/div/div/div[1]/div/div/div/div/div/div/div/div/div';
+const SEL_VOTERS = '/html/body/div[1]/div[3]/div[1]/div/div[1]/div[2]/div/div/div/div/div[2]/ul';
 
 // Run this when the meteor app is started
 Meteor.startup(function () {
@@ -15,7 +17,7 @@ Meteor.startup(function () {
 	
 	if (Meteor.settings.private.testMode) {
 		console.log("App running in test mode");
-		//run();
+		run();
 	} else {
 		console.log("App running in production mode");
 		Meteor.setInterval(() => {
@@ -64,22 +66,21 @@ async function run() {
 
 async function getPollData(page) {
 	console.log("Navigating to HV Twister page..");
-	page.goto(URL_HVTWISTER);
+	const response = await page.goto(URL_HVTWISTER);
+	const responseText = await response.text();
+	const polls = [];
 
-	await page.waitForNavigation();
-	console.log("HV Twister page loaded");
+	// Read all poll urls and add these to the polls array
+	const pollsRaw = responseText.split('\"Question\",\"id\":\"');
+	for (let i = 1; i < pollsRaw.length; i++) {
+		// Extract poll url
+		const urlString = pollsRaw[i].split('\"story\":{\"creation_time\":')[1].split(',"url":"')[1];
+		const url = urlString.split('\",\"ghl_label\"')[0];
+		polls.push(url.replace(/\\/g, ''));
+	}	
 
-	// wait and click the alert button (quickfix - otherwise it will not work)
-	console.log('Waiting for 3s');
-	await page.waitFor(3000);
-
-	// Close reminders black screen
-	await page.keyboard.press('Escape');
-	console.log('Escape pressed - black screen closed');
-
-	/**
-	 * The below section should be uncommented in case more polls from history are needed
-	 */
+	/*
+	// TODO: Add logic to receive data from GraphQL for scrolled content
 
 	let previousHeight;
 	let scrollLimit = Meteor.settings.private.scrollLimit;
@@ -96,9 +97,8 @@ async function getPollData(page) {
 			console.error("Scrolling failed: " + e.message);
 		}
 	}
-
-	// Get all posts including a poll
-	const polls = await page.evaluate(() => Array.from(document.querySelectorAll('//*[@id="facebook"]/body/script[73]/text()'), element => element.innerHTML));
+	
+	*/
 
 	// Filter out only relevant polls
 	await filterRelevantPolls(polls, page);
@@ -150,84 +150,99 @@ async function filterRelevantPolls(polls, page) {
 
 	for (let i=0; i<polls.length; i++) {
 		
-			console.log("Poll nr " + i);
+		console.log("Poll nr " + i);
 
-			// Extract poll creator name
-			const name = polls[i].split('<div class=\"nc684nl6\"><span>')[1].split('</span></div>')[0];
-			
-			// Extract poll date
-			/*const dateString = polls[i].split(/data-utime="[0-9]*" title="/)[1].split('\" data-shorten=\"1\"')[0];
-			const temp = dateString.split(". ")[1].split(" ");
+		// Navigate to poll URL
+		console.log("Navigating to poll: " + polls[i]);
+		await page.goto(polls[i]);
 
-			const day = dateString.split(" ")[1].split(".")[0];
-			const month = temp[0];
-			const year = temp[1];
-			const time = temp[3].split(":");
+		// Select current poll container
+		const element = await page.waitForXPath(SEL_CURRENT_POLL);
 
-			const date = new Date(year, getMonth(month), day, time[0], time[1]);
-			*/
-			// Extract poll message
-			// TODO - add handling logic for multiple paragraphs
+		// Select current poll text data
+		const text = await page.evaluate(element => element.innerHTML, element);
 
-			let message = "";
+		// Extract poll creator name
+		const name = text.split('<div class="nc684nl6"><span>')[1].split('</span></div>')[0];
+
+		// Extract poll date
+		const dateString = text.split('role="link" tabindex="0"><span>')[1].split('</span></a>')[0];
+		const temp = dateString.split(" ");
+
+		const currentDate = new Date();
+
+		let day, month, year, time;
+
+		if(temp[0] === 'Eile' || temp[0] === 'Täna') {
+			day = currentDate.getDate() - 1;
+			month = currentDate.getMonth();
+			year = currentDate.getFullYear();
+			time = temp[2].split(":");
+		} else {
+			day = temp[0].split(".")[0];
+			month = getMonth(temp[1]);
+			// TODO: What happens if poll from previous year?
+			year = currentDate.getFullYear();
+			time = temp[3].split(":");
+		}
+
+		const date = new Date(year, month, day, time[0], time[1]);
+		
+		// Extract poll message
+		// TODO - add handling logic for multiple paragraphs
+
+		let message = "";
+
 		try {
-			message = polls[i].split('<div dir=\"auto\" style=\"text-align: start;\">')[1].split('</div>')[0];
-			console.log(message);
+			message = text.split('<div dir=\"auto\" style=\"text-align: start;\">')[1].split('</div>')[0];
+			//console.log(message);
 			// Extract poll options
-			const optionsString = polls[i].split('<span class=\"oi732d6d ik7dh3pa d2edcug0 qv66sw1b c1et5uql a8c37x1j muag1w35 enqfppq2 jq4qci2q a3bd9o3v knj5qynh oo9gr5id\" dir=\"auto\">');
+			const optionsArrayRaw = text.split('<div class=\"ecm0bbzt e5nlhep0 i1fnvgqd btwxx1t3 j83agx80 bp9cbjyn\">');
 			const options = [];
 
-			for (let iter = 1; iter < optionsString.length; iter++) {
-				let tmp = optionsString[iter].split('</span></div></div></div></div></div></div><div class=\"a8yuo7t3');
+			for (let iter = 1; iter < optionsArrayRaw.length; iter++) {
 
-				if (tmp.length > 1) {
-					options.push(tmp[0]);
+				const optionText = optionsArrayRaw[iter].split('</span></a></span></div><span class=\"oi732d6d ik7dh3pa d2edcug0 qv66sw1b c1et5uql a8c37x1j muag1w35 enqfppq2 jq4qci2q a3bd9o3v knj5qynh oo9gr5id\" dir=\"auto\">');
+				const optionId = optionsArrayRaw[iter].split('name=\"option_');
+				
+
+				if (optionText.length > 1) {
+					options.push({
+						id: optionId[1].split('\" aria-checked=')[0],
+						text: optionText[1].split('</span></div></div></div>')[0],
+						pollDate: date
+					});
 				}
-
 			}
 
-			console.log(options);
-
 			// Extract voters for each option
-			const votersRow = polls[i].split('<div class=\"j83agx80 btwxx1t3 pfnyh3mw lhclo0ds ni8dbmo4 stjgntxs l9j0dhe7\" role=\"row\" style=\"height: 24px;\">');
-			
 			const voters = [];
 			let optionVoters = [];
 
-			for (let iter = 1; iter < votersRow.length; iter++) {
-				const votersItems = votersRow[iter].split('<div class=\"sej5wr8e l9j0dhe7\" role=\"cell\">');
-				let votersURL = "";
+			for (let iter = 0; iter < options.length; iter++) {
+				// Navigate to poll URL
+				console.log("Navigating to option: " + URL_VOTERS + options[iter].id);
+				await page.goto(URL_VOTERS + options[iter].id);
 
-				console.log("Voters item length: " + votersItems.length);
+				// Select voters container
+				const element = await page.waitForXPath(SEL_VOTERS);
 
-				// Check if link exists for all voters (More option)
-				try {
-					const optionId = votersItems[votersItems.length-1].split('/browse/option_voters?option_id=')[1].split('\" role=')[0];
-					votersURL = URL_VOTERS + optionId;
-					
-				} catch (e) {
-					console.error("Poll nr " + i + ": " + e.message);
+				// Select current poll text data
+				const votersListRaw = await page.evaluate(element => element.innerHTML, element);
+				const votersList = votersListRaw.split(' alt=\"\" aria-label=\"');
+
+				// Extract voters names
+				for (let j = 1; j < votersList.length; j++) {
+					const voterName = votersList[j].split('\" role=\"img\">')[0];
+					optionVoters.push(voterName);
 				}
-
-				// If link exists for all voters, get names from URL
-				if (votersURL != "") {
-					optionVoters = await parseVotersURL(page, votersURL);					
-				// If link does not exist, get names form poll directly
-				} else {
-					for (let cell = 0; cell < (votersItems.length - 1); cell++) {
-						optionVoters.push(votersItems[cell].split('<li class=\"_43q7\"><a aria-label=\"')[1]);
-					}
-				}
-
+				
 				voters.push({
-					option: options[iter-1],
+					option: options[iter],
 					voters: optionVoters
 				});
 				optionVoters = [];
 			}
-
-			console.log(voters[0]);
-			console.log(voters[1]);
 
 			relevantPolls.push({
 				creator: name,
@@ -243,6 +258,7 @@ async function filterRelevantPolls(polls, page) {
 
 	console.log(relevantPolls.length);
 	console.log(relevantPolls);
+	console.log(relevantPolls[0].answers);
 
 	// Persist results in DB
 	updatePolls(relevantPolls);
