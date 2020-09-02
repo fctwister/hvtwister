@@ -2,6 +2,7 @@ import { Meteor } from 'meteor/meteor';
 import puppeteer from 'puppeteer';
 import loginPage from './actions/login';
 import { updatePolls } from './db/polls';
+import { updatePlayers, addPlayer } from './db/players';
 import '../imports/publish/polls';
 
 var fs = require('fs');
@@ -13,21 +14,23 @@ const SEL_VOTERS = '/html/body/div[1]/div[3]/div[1]/div/div[1]/div[2]/div/div/di
 
 // Run this when the meteor app is started
 Meteor.startup(function () {
+	// Update all HV Twister players in DB and return the players array
+	const players = loadPlayersToDB(Meteor.settings.private.playersFileLocation);
+
 	// Initate script to run periodically
-	
 	if (Meteor.settings.private.testMode) {
 		console.log("App running in test mode");
-		run();
+		run(players);
 	} else {
 		console.log("App running in production mode");
 		Meteor.setInterval(() => {
 			console.log("Starting the Polls scraper");
-			run();
+			run(players);
 		}, Meteor.settings.private.scriptInterval);
 	}
 });
 
-async function run() {
+async function run(players) {
 
 	const browser = await puppeteer.launch({
 		headless: Meteor.settings.private.headless,
@@ -42,6 +45,9 @@ async function run() {
 			//'--disable-gl-drawing-for-tests' // improve performance
 		] 
 	});
+
+	const context = browser.defaultBrowserContext();
+    context.overridePermissions("https://www.facebook.com", ["geolocation", "notifications"]);
   
 	page = await browser.newPage();
   
@@ -234,7 +240,10 @@ async function filterRelevantPolls(polls, page) {
 				// Extract voters names
 				for (let j = 1; j < votersList.length; j++) {
 					const voterName = votersList[j].split('\" role=\"img\">')[0];
-					optionVoters.push(voterName);
+					optionVoters.push({
+						name: voterName,
+						id: getVoterId(voterName)
+					});
 				}
 				
 				voters.push({
@@ -285,4 +294,20 @@ async function parseVotersURL(page, url) {
 	return result;
 }
 
+function loadPlayersToDB(fileName) {
+	// Read players from file
+	console.log("Reading players from file: " + fileName);
+	const players = JSON.parse(fs.readFileSync(fileName, 'utf8')); 
+	console.log(players.length);
 
+	// Updating players in database
+	updatePlayers(players);
+
+	// Return players object
+	return players;
+}
+
+function getVoterId(name) {
+	// Check if player with that name already exists in the database
+	console.log(addPlayer(name));
+}

@@ -1,1 +1,1 @@
-meteor npm install --save puppeteer
+meteor npm install --save puppeteer react-dom react react-router history
