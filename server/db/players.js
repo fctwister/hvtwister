@@ -15,15 +15,20 @@ function updatePlayers(players) {
 }
 
 function addPlayer(name) {
-    const result = Players.upsert({
-        "name": name
-    },{
-        $set: {
-            "name": name,
-            "id": Players.count()
-        }
-    });
+    const result = Players.find({"name": name});
+    const count = Players.find().count() + 1;
 
-    console.log(result);
+    if (result.count() === 0) {
+        console.log("Adding player: " + name + ", id: " + count);
+
+        Players.insert({
+            "name": name,
+            "id": count
+        });
+
+        return count;
+    } else {
+        return result.fetch()[0].id;
+    }
 }
 export { updatePlayers, addPlayer }

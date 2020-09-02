@@ -9,7 +9,7 @@ var fs = require('fs');
 
 const URL_HVTWISTER = 'https://www.facebook.com/groups/hvjalka';
 const URL_VOTERS='https://www.facebook.com/browse/option_voters?option_id=';
-const SEL_CURRENT_POLL = '/html/body/div[1]/div/div[1]/div[1]/div[3]/div/div/div[1]/div[1]/div[4]/div/div/div/div/div/div[1]/div/div/div/div/div/div/div/div/div';
+const SEL_CURRENT_POLL = '/html/body/div[1]/div/div[1]/div[1]/div[3]/div/div/div[1]/div[1]/div[4]/div/div/div/div/div[1]/div[2]/div[1]/div[2]';
 const SEL_VOTERS = '/html/body/div[1]/div[3]/div[1]/div/div[1]/div[2]/div/div/div/div/div[2]/ul';
 
 // Run this when the meteor app is started
@@ -194,21 +194,22 @@ async function filterRelevantPolls(polls, page) {
 
 		const date = new Date(year, month, day, time[0], time[1]);
 		
-		// Extract poll message
+		// Extract poll message and voters
 		// TODO - add handling logic for multiple paragraphs
 
 		let message = "";
 
 		try {
+			// Extract poll message
 			message = text.split('<div dir=\"auto\" style=\"text-align: start;\">')[1].split('</div>')[0];
-			//console.log(message);
+			
 			// Extract poll options
 			const optionsArrayRaw = text.split('<div class=\"ecm0bbzt e5nlhep0 i1fnvgqd btwxx1t3 j83agx80 bp9cbjyn\">');
 			const options = [];
-
+			
 			for (let iter = 1; iter < optionsArrayRaw.length; iter++) {
 
-				const optionText = optionsArrayRaw[iter].split('</span></a></span></div><span class=\"oi732d6d ik7dh3pa d2edcug0 qv66sw1b c1et5uql a8c37x1j muag1w35 enqfppq2 jq4qci2q a3bd9o3v knj5qynh oo9gr5id\" dir=\"auto\">');
+				const optionText = optionsArrayRaw[iter].split('</span></a></span></div><span class=\"oi732d6d ik7dh3pa d2edcug0 hpfvmrgz qv66sw1b c1et5uql a8c37x1j muag1w35 enqfppq2 jq4qci2q a3bd9o3v knj5qynh oo9gr5id\" dir=\"auto\">');
 				const optionId = optionsArrayRaw[iter].split('name=\"option_');
 				
 
@@ -240,6 +241,7 @@ async function filterRelevantPolls(polls, page) {
 				// Extract voters names
 				for (let j = 1; j < votersList.length; j++) {
 					const voterName = votersList[j].split('\" role=\"img\">')[0];
+
 					optionVoters.push({
 						name: voterName,
 						id: getVoterId(voterName)
@@ -309,5 +311,5 @@ function loadPlayersToDB(fileName) {
 
 function getVoterId(name) {
 	// Check if player with that name already exists in the database
-	console.log(addPlayer(name));
+	return addPlayer(name); 
 }
