@@ -5,7 +5,7 @@ export default class VotersData extends React.Component {
 
   render() {
   
-    const voters = this.props.votersData.names;
+    const voters = this.props.votersData.voters;
     const options = this.props.votersData.options;
 
     const result = [];
@@ -24,9 +24,9 @@ export default class VotersData extends React.Component {
 
       result.push(
         <VotersRow
-          name={voter.name}
+          name={voter.player.name}
           voterValues={voterValues}
-          key={voter.name} />
+          key={voter.player.name} />
       );
     });
       

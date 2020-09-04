@@ -5,6 +5,7 @@
 		"headless": true,
 		"scrollLimit": 0,
 		"scriptInterval": 3600000,
-		"testMode": false
+		"testMode": false,
+		"playersFileLocation": ".//players.json"   
     }
 }

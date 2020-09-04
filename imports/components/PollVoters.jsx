@@ -16,6 +16,17 @@ export default class PollVoters extends React.Component {
     let votersMatrix = [];
     let validOptionFound = false;
 
+    const players = this.props.players;
+
+    // Populate empty votersArray with all player names 
+    for (let i = 0; i < players.length; i++) {
+      votersArray.push({
+        player: players[i],
+        dates: [],
+        options: []
+      });
+    }
+
     // Extract date for table header and voters for table data
     // TODO: Order dates asc
     data.forEach(pollData => {
@@ -54,7 +65,7 @@ export default class PollVoters extends React.Component {
     let votersData = {
       dates: pollDates,
       options: pollValidOptions,
-      names: votersArray
+      voters: votersArray
     }
 
     return (
@@ -68,7 +79,7 @@ export default class PollVoters extends React.Component {
 
 function search(nameKey, myArray){
   for (var i=0; i < myArray.length; i++) {
-      if (myArray[i].name === nameKey) {
+      if (myArray[i].player && myArray[i].player.name === nameKey) {
           return i;
       }
   }
@@ -78,12 +89,12 @@ function search(nameKey, myArray){
 function updateVotersArray(answer, date) {
   answer.voters.forEach(voter => {
     // Search for voter name in the votersArray
-    const res = search(voter, votersArray);
+    const res = search(voter.name, votersArray);
 
     // If voter does not exist, create a new object in the array
     if (res === null) {
       votersArray.push({
-        name: voter,
+        player: voter,
         dates: [date],
         options: [answer.option]
       });

@@ -4,12 +4,13 @@ import loginPage from './actions/login';
 import { updatePolls } from './db/polls';
 import { updatePlayers, addPlayer } from './db/players';
 import '../imports/publish/polls';
+import '../imports/publish/players';
 
 var fs = require('fs');
 
 const URL_HVTWISTER = 'https://www.facebook.com/groups/hvjalka';
 const URL_VOTERS='https://www.facebook.com/browse/option_voters?option_id=';
-const SEL_CURRENT_POLL = '/html/body/div[1]/div/div[1]/div[1]/div[3]/div/div/div[1]/div[1]/div[4]/div/div/div/div/div[1]/div[2]/div[1]/div[2]';
+const SEL_CURRENT_POLL = '/html/body/div[1]/div/div[1]/div[1]/div[3]/div/div/div[1]/div[1]/div[4]/div/div/div/div';
 const SEL_VOTERS = '/html/body/div[1]/div[3]/div[1]/div/div[1]/div[2]/div/div/div/div/div[2]/ul';
 
 // Run this when the meteor app is started
@@ -24,8 +25,12 @@ Meteor.startup(function () {
 	} else {
 		console.log("App running in production mode");
 		Meteor.setInterval(() => {
-			console.log("Starting the Polls scraper");
-			run(players);
+			try {
+				console.log("Starting the Polls scraper");
+				run(players);
+			} catch (e) {
+				console.error("Error executing run() function: " + e.message);
+			}
 		}, Meteor.settings.private.scriptInterval);
 	}
 });
