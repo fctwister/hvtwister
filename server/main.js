@@ -16,7 +16,8 @@ const SEL_VOTERS = '/html/body/div[1]/div[3]/div[1]/div/div[1]/div[2]/div/div/di
 // Run this when the meteor app is started
 Meteor.startup(function () {
 	// Update all HV Twister players in DB and return the players array
-	const players = loadPlayersToDB(Meteor.settings.private.playersFileLocation);
+	// File in /private folder can be accessed this way
+	const players = loadPlayersToDB('assets/app/players.json');
 
 	// Initate script to run periodically
 	if (Meteor.settings.private.testMode) {
