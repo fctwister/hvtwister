@@ -175,7 +175,7 @@ async function filterRelevantPolls(polls, page) {
 
 			// Extract poll creator name
 			const nameString = text.split('<div class="nc684nl6"><span>');
-			console.log("Name string: " + nameString);
+			//console.log("Name string: " + nameString);
 
 			const name = nameString[1].split('</span></div>')[0];
 			console.log("Name: " + name);
@@ -183,6 +183,7 @@ async function filterRelevantPolls(polls, page) {
 			// Extract poll date
 			const dateString = text.split('role="link" tabindex="0"><span>')[1].split('</span></a>')[0];
 			const temp = dateString.split(" ");
+			console.log("Date: " + temp);
 			
 			const currentDate = new Date();
 
