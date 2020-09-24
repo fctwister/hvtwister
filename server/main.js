@@ -176,8 +176,10 @@ async function filterRelevantPolls(polls, page) {
 			// Extract poll creator name
 			const nameString = text.split('<div class="nc684nl6"><span>');
 			
+			let name = "";
+
 			if (nameString.length > 1) {
-				const name = nameString[1].split('</span></div>')[0];
+				name = nameString[1].split('</span></div>')[0];
 				console.log("Name: " + name);
 			} else {
 				throw new Error ("Name string has too few elements: " + nameString);
