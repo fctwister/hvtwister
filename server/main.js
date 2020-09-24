@@ -227,7 +227,7 @@ async function filterRelevantPolls(polls, page) {
 			// Extract poll message
 			messageString = text.split('<div dir=\"auto\" style=\"text-align: start;\">');
 
-			if (messageString > 1) {
+			if (messageString.length > 1) {
 				message = messageString[1].split('</div>')[0];
 			} else {
 				throw new Error ("Message string has too few elements: " + messageString);
