@@ -269,7 +269,7 @@ async function filterRelevantPolls(polls, page) {
 			})
 			
 		} catch (e) {
-			console.error("Poll nr " + i + ": " + e.message);
+			console.error("Poll nr " + i + ": " + e);
 		}
 	}
 
