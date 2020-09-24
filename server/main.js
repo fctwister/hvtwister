@@ -26,18 +26,18 @@ Meteor.startup(function () {
 		run(players);
 	} else {
 		console.log("App running in production mode");
+		// Start scraper after app is launched
+		run(players);
+
+		// Set interval for running scraper
 		Meteor.setInterval(() => {
-			try {
-				console.log("Starting the Polls scraper");
-				run(players);
-			} catch (e) {
-				console.error("Error executing run() function: " + e.message);
-			}
+			run(players);
 		}, Meteor.settings.private.scriptInterval);
 	}
 });
 
 async function run(players) {
+	console.log("Starting the Polls scraper");
 	try {
 		const browser = await puppeteer.launch({
 			headless: Meteor.settings.private.headless,
