@@ -180,6 +180,8 @@ async function filterRelevantPolls(polls, page) {
 			const dateString = text.split('role="link" tabindex="0"><span>')[1].split('</span></a>')[0];
 			const temp = dateString.split(" ");
 			console.log(temp[0]);
+			console.log(temp[1]);
+			console.log(temp[2]);
 
 			const currentDate = new Date();
 
