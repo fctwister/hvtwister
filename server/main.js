@@ -179,6 +179,7 @@ async function filterRelevantPolls(polls, page) {
 			// Extract poll date
 			const dateString = text.split('role="link" tabindex="0"><span>')[1].split('</span></a>')[0];
 			const temp = dateString.split(" ");
+			console.log(temp[0]);
 
 			const currentDate = new Date();
 
