@@ -174,15 +174,16 @@ async function filterRelevantPolls(polls, page) {
 			const text = await page.evaluate(element => element.innerHTML, element);
 
 			// Extract poll creator name
-			const name = text.split('<div class="nc684nl6"><span>')[1].split('</span></div>')[0];
+			const nameString = text.split('<div class="nc684nl6"><span>');
+			console.log("Name string: " + nameString);
+
+			const name = nameString[1].split('</span></div>')[0];
+			console.log("Name: " + name);
 
 			// Extract poll date
 			const dateString = text.split('role="link" tabindex="0"><span>')[1].split('</span></a>')[0];
 			const temp = dateString.split(" ");
-			console.log(temp[0]);
-			console.log(temp[1]);
-			console.log(temp[2]);
-
+			
 			const currentDate = new Date();
 
 			let day, month, year, time;
