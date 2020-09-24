@@ -170,9 +170,6 @@ async function filterRelevantPolls(polls, page) {
 			// Select current poll container
 			const element = await page.waitForXPath(SEL_CURRENT_POLL);
 
-			// Add delay to wait until page gets loaded
-			await page.waitFor(10000);
-
 			// Select current poll text data
 			const text = await page.evaluate(element => element.innerHTML, element);
 
@@ -240,18 +237,20 @@ async function filterRelevantPolls(polls, page) {
 			const optionsArrayRaw = text.split('<div class=\"ecm0bbzt e5nlhep0 i1fnvgqd btwxx1t3 j83agx80 bp9cbjyn\">');
 			const options = [];
 
-			console.log("Poll nr " + i + " options length: " + options.length);
+			console.log("Poll nr " + i + " options length: " + optionsArrayRaw.length);
 			
 			for (let iter = 1; iter < optionsArrayRaw.length; iter++) {
 
-				const optionText = optionsArrayRaw[iter].split('</span></a></span></div><span class=\"oi732d6d ik7dh3pa d2edcug0 hpfvmrgz qv66sw1b c1et5uql a8c37x1j muag1w35 enqfppq2 jq4qci2q a3bd9o3v knj5qynh oo9gr5id\" dir=\"auto\">');
+				const optionText = optionsArrayRaw[iter].split('<input dir=\"auto\" aria-label=\"');
+															                           
 				const optionId = optionsArrayRaw[iter].split('name=\"option_');
 				
+				console.log("Option nr " + iter + " length: " + optionText.length);
 
 				if (optionText.length > 1) {
 					options.push({
 						id: optionId[1].split('\" aria-checked=')[0],
-						text: optionText[1].split('</span></div></div></div>')[0],
+						text: optionText[1].split('\" name=')[0],
 						pollDate: date
 					});
 				}
