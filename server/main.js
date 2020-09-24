@@ -225,11 +225,19 @@ async function filterRelevantPolls(polls, page) {
 			let message = "";
 		
 			// Extract poll message
-			message = text.split('<div dir=\"auto\" style=\"text-align: start;\">')[1].split('</div>')[0];
+			messageString = text.split('<div dir=\"auto\" style=\"text-align: start;\">');
+
+			if (messageString > 1) {
+				message = messageString[1].split('</div>')[0];
+			} else {
+				throw new Error ("Message string has too few elements: " + messageString);
+			}
 			
 			// Extract poll options
 			const optionsArrayRaw = text.split('<div class=\"ecm0bbzt e5nlhep0 i1fnvgqd btwxx1t3 j83agx80 bp9cbjyn\">');
 			const options = [];
+
+			console.log("Poll nr " + i + " options length: " + options.length);
 			
 			for (let iter = 1; iter < optionsArrayRaw.length; iter++) {
 
