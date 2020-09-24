@@ -171,7 +171,7 @@ async function filterRelevantPolls(polls, page) {
 			const element = await page.waitForXPath(SEL_CURRENT_POLL);
 
 			// Add delay to wait until page gets loaded
-			await page.waitFor(3000);
+			await page.waitFor(10000);
 
 			// Select current poll text data
 			const text = await page.evaluate(element => element.innerHTML, element);
