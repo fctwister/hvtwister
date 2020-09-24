@@ -170,8 +170,10 @@ async function filterRelevantPolls(polls, page) {
 			// Select current poll container
 			const element = await page.waitForXPath(SEL_CURRENT_POLL);
 
+			// Add delay to wait until page gets loaded
+			await page.waitFor(3000);
+
 			// Select current poll text data
-			await page.waitForNavigation();
 			const text = await page.evaluate(element => element.innerHTML, element);
 
 			// Extract poll creator name
