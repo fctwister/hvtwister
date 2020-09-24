@@ -186,8 +186,16 @@ async function filterRelevantPolls(polls, page) {
 			}
 
 			// Extract poll date
-			const dateString = text.split('role="link" tabindex="0"><span>')[1].split('</span></a>')[0];
-			const temp = dateString.split(" ");
+			const dateString = text.split('role="link" tabindex="0"><span>');
+
+			let temp = "";
+
+			if (dateString.length > 1) {
+				temp = dateString[1].split('</span></a>')[0].split(" ");
+			} else {
+				throw new Error ("Date string has too few elements: " + dateString);
+			}
+
 			console.log("Date: " + temp);
 			
 			const currentDate = new Date();
