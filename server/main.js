@@ -5,6 +5,7 @@ import { updatePolls } from './db/polls';
 import { updatePlayers, addPlayer } from './db/players';
 import '../imports/publish/polls';
 import '../imports/publish/players';
+import { throws } from 'assert';
 
 var fs = require('fs');
 
@@ -37,28 +38,26 @@ Meteor.startup(function () {
 });
 
 async function run(players) {
-
-	const browser = await puppeteer.launch({
-		headless: Meteor.settings.private.headless,
-		defaultViewport: {	
-			width: 1920,	
-			height: 1080	
-		},
-		//executablePath: Meteor.settings.private.executablePath,
-		args: [
-			`--window-size=1920,1080`,  // set browser size
-  			//'--user-data-dir=' + Meteor.settings.private.userDataDir,
-			//'--disable-gl-drawing-for-tests' // improve performance
-		] 
-	});
-
-	const context = browser.defaultBrowserContext();
-    context.overridePermissions("https://www.facebook.com", ["geolocation", "notifications"]);
-  
-	page = await browser.newPage();
-  
-	// Login to Facebook
 	try {
+		const browser = await puppeteer.launch({
+			headless: Meteor.settings.private.headless,
+			defaultViewport: {	
+				width: 1920,	
+				height: 1080	
+			},
+			//executablePath: Meteor.settings.private.executablePath,
+			args: [
+				`--window-size=1920,1080`,  // set browser size
+				//'--user-data-dir=' + Meteor.settings.private.userDataDir,
+				//'--disable-gl-drawing-for-tests' // improve performance
+			] 
+		});
+
+		const context = browser.defaultBrowserContext();
+		context.overridePermissions("https://www.facebook.com", ["geolocation", "notifications"]);
+	
+		page = await browser.newPage();
+	
 		// Start login function with tries counter set to 1
 		page = await loginPage(page);
 
@@ -161,51 +160,52 @@ async function filterRelevantPolls(polls, page) {
 	console.log("Polls length: " + polls.length);
 
 	for (let i=0; i<polls.length; i++) {
-		
 		console.log("Poll nr " + i);
-
-		// Navigate to poll URL
-		console.log("Navigating to poll: " + polls[i]);
-		await page.goto(polls[i]);
-
-		// Select current poll container
-		const element = await page.waitForXPath(SEL_CURRENT_POLL);
-
-		// Select current poll text data
-		const text = await page.evaluate(element => element.innerHTML, element);
-
-		// Extract poll creator name
-		const name = text.split('<div class="nc684nl6"><span>')[1].split('</span></div>')[0];
-
-		// Extract poll date
-		const dateString = text.split('role="link" tabindex="0"><span>')[1].split('</span></a>')[0];
-		const temp = dateString.split(" ");
-
-		const currentDate = new Date();
-
-		let day, month, year, time;
-
-		if(temp[0] === 'Eile' || temp[0] === 'Täna') {
-			day = currentDate.getDate() - 1;
-			month = currentDate.getMonth();
-			year = currentDate.getFullYear();
-			time = temp[2].split(":");
-		} else {
-			day = temp[0].split(".")[0];
-			month = getMonth(temp[1]);
-			// TODO: What happens if poll from previous year?
-			year = currentDate.getFullYear();
-			time = temp[3].split(":");
-		}
-
-		const date = new Date(year, month, day, time[0], time[1]);
 		
-		// Extract poll message and voters
-		// TODO - add handling logic for multiple paragraphs
-
-		let message = "";
-
 		try {
+			// Navigate to poll URL
+			console.log("Navigating to poll: " + polls[i]);
+			await page.goto(polls[i]);
+
+			// Select current poll container
+			const element = await page.waitForXPath(SEL_CURRENT_POLL);
+
+			// Select current poll text data
+			const text = await page.evaluate(element => element.innerHTML, element);
+
+			// Extract poll creator name
+			const name = text.split('<div class="nc684nl6"><span>')[1].split('</span></div>')[0];
+
+			// Extract poll date
+			const dateString = text.split('role="link" tabindex="0"><span>')[1].split('</span></a>')[0];
+			const temp = dateString.split(" ");
+
+			const currentDate = new Date();
+
+			let day, month, year, time;
+
+			//TODO: add condition for today '1h'
+
+			if(temp[0] === 'Eile' || temp[0] === 'Täna') {
+				day = currentDate.getDate() - 1;
+				month = currentDate.getMonth();
+				year = currentDate.getFullYear();
+				time = temp[2].split(":");
+			} else {
+				day = temp[0].split(".")[0];
+				month = getMonth(temp[1]);
+				// TODO: What happens if poll from previous year?
+				year = currentDate.getFullYear();
+				time = temp[3].split(":");
+			}
+
+			const date = new Date(year, month, day, time[0], time[1]);
+			
+			// Extract poll message and voters
+			// TODO - add handling logic for multiple paragraphs
+
+			let message = "";
+		
 			// Extract poll message
 			message = text.split('<div dir=\"auto\" style=\"text-align: start;\">')[1].split('</div>')[0];
 			
