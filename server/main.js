@@ -144,7 +144,7 @@ function getMonth(monthsString) {
 			return 7;
 		case "september":
 			return 8;
-		case "Oktoober":
+		case "oktoober":
 			return 9;
 		case "november":
 			return 10;
@@ -186,7 +186,7 @@ async function filterRelevantPolls(polls, page) {
 			}
 
 			// Extract poll date
-			const dateString = text.split('role="link" tabindex="0"><span>');
+			const dateString = text.split('role=\"link\" tabindex=\"0\"><span><span,aria-labelledby=\"jsc_c_18\",aria-label=\"');
 
 			let temp = "";
 
