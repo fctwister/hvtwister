@@ -144,7 +144,7 @@ function getMonth(monthsString) {
 			return 7;
 		case "september":
 			return 8;
-		case "oktoober":
+		case "Oktoober":
 			return 9;
 		case "november":
 			return 10;
