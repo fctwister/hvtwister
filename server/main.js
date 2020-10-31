@@ -194,7 +194,7 @@ async function filterRelevantPolls(polls, page) {
 			let temp = "";
 
 			if (dateString.length > 1) {
-				temp = dateString[1].split('</span></a>')[0].split(" ");
+				temp = dateString[1].split('\" class=\"')[0].split(" ");
 			} else {
 				throw new Error ("Date string has too few elements: " + dateString);
 			}
