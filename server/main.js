@@ -188,7 +188,7 @@ async function filterRelevantPolls(polls, page) {
 			}
 
 			// Extract poll date
-			const dateString = text.split('<a aria-label=\"');
+			const dateString = text.split('aria-labelledby=\"jsc_c_1j\" aria-label=\"');
 
 			let temp = "";
 
