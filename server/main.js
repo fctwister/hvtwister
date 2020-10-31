@@ -177,7 +177,7 @@ async function filterRelevantPolls(polls, page) {
 
 			// Extract poll creator name
 			const nameString = text.split('<div class="nc684nl6"><span>');
-			console.log("NameString: " + nameString);
+			console.log("NameString: " + nameString[1]);
 
 			let name = "";
 
@@ -189,7 +189,7 @@ async function filterRelevantPolls(polls, page) {
 
 			// Extract poll date
 			const dateString = text.split('aria-labelledby=\"jsc_c_1j\" aria-label=\"');
-			console.log("DateString: " + dateString);
+			console.log("DateString: " + dateString[1]);
 
 			let temp = "";
 
