@@ -177,18 +177,19 @@ async function filterRelevantPolls(polls, page) {
 
 			// Extract poll creator name
 			const nameString = text.split('<div class="nc684nl6"><span>');
-			
+			console.log("NameString: " + nameString);
+
 			let name = "";
 
 			if (nameString.length > 1) {
 				name = nameString[1].split('</span></div>')[0];
-				console.log("Name: " + name);
 			} else {
 				throw new Error ("Name string has too few elements: " + nameString);
 			}
 
 			// Extract poll date
 			const dateString = text.split('aria-labelledby=\"jsc_c_1j\" aria-label=\"');
+			console.log("DateString: " + dateString);
 
 			let temp = "";
 
