@@ -90,7 +90,7 @@ async function getPollData(page) {
 		polls.push(url.replace(/\\/g, ''));
 	}	
 
-	
+	/*
 	// TODO: Add logic to receive data from GraphQL for scrolled content
 
 	let previousHeight;
@@ -109,6 +109,7 @@ async function getPollData(page) {
 		}
 	}
 	
+	*/
 
 	// Filter out only relevant polls
 	await filterRelevantPolls(polls, page);
