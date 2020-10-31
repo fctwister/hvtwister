@@ -173,6 +173,8 @@ async function filterRelevantPolls(polls, page) {
 			// Select current poll text data
 			const text = await page.evaluate(element => element.innerHTML, element);
 
+			console.log("Text: " + text);
+
 			// Extract poll creator name
 			const nameString = text.split('<div class="nc684nl6"><span>');
 			
