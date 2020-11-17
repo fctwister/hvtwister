@@ -2,7 +2,7 @@ import React from 'react';
 import VotersHeader from './VotersHeader';
 import VotersData from './VotersData';
 
-const VALID_OPTIONS = ["yes", "1", "Hell yeah"];
+const VALID_OPTIONS = ["yes", "1", "Hell yeah", "Yes"];
 let votersArray = [];
 
 export default class PollVoters extends React.Component {
